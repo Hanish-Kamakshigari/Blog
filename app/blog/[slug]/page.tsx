@@ -1,0 +1,120 @@
+import { supabase } from "@/lib/supabase";
+
+export default async function BlogPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+
+  // Fetch blog from Supabase
+  const { data: blog, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("slug", slug)
+    .single();
+
+  // Fetch recommendations
+  const { data: recommendations } = await supabase
+    .from("posts")
+    .select("*")
+    .neq("slug", slug)
+    .limit(4);
+
+  if (error || !blog) {
+    return (
+      <main className="p-10 min-h-screen bg-[#FAF9F6] text-black">
+        <h1 className="text-2xl font-bold">
+          Blog not found
+        </h1>
+      </main>
+    );
+  }
+
+  const readTime = Math.max(1, Math.ceil((blog.content || "").split(/\s+/).length / 200));
+  const dateObj = new Date(blog.created_at || Date.now());
+  const dateString = dateObj.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  return (
+    <main className="min-h-screen pb-24 bg-[#FAF9F6] text-black">
+      {/* Navbar/Header equivalent */}
+      <nav className="px-8 py-8 max-w-4xl mx-auto">
+        <a href="/" className="text-gray-500 hover:text-black flex items-center gap-2 transition w-fit font-medium">
+          ← Back to Home
+        </a>
+      </nav>
+
+      <article className="max-w-4xl mx-auto px-8">
+        {/* Title */}
+        <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+          {blog.title}
+        </h1>
+
+        {/* Meta */}
+        <div className="flex items-center text-sm text-gray-500 mb-8 pb-8 border-b border-black/10">
+          <div className="flex items-center gap-2 mt-0.5 text-xs">
+            <span>{dateString}</span>
+            <span>•</span>
+            <span>{readTime} min read</span>
+          </div>
+        </div>
+
+        {/* Cover Image */}
+        {blog.cover_image && (
+          <img
+            src={blog.cover_image}
+            alt={blog.title}
+            className="w-full h-[400px] object-cover rounded-2xl mb-10 shadow-sm"
+          />
+        )}
+
+        {/* Content */}
+        <div className="text-lg leading-relaxed whitespace-pre-line text-gray-800">
+          {blog.content}
+        </div>
+      </article>
+
+      {/* Recommendations */}
+      {recommendations && recommendations.length > 0 && (
+        <section className="max-w-4xl mx-auto px-8 mt-24 pt-12 border-t border-black/10">
+          <h3 className="text-2xl font-bold mb-8">More to read</h3>
+          <div className="grid sm:grid-cols-2 gap-8">
+            {recommendations.map((rec) => {
+              const recReadTime = Math.max(1, Math.ceil((rec.content || "").split(/\s+/).length / 200));
+              return (
+                <a
+                  key={rec.id}
+                  href={`/blog/${rec.slug}`}
+                  className="group flex flex-col bg-white border border-black/10 rounded-xl overflow-hidden hover:shadow-md transition"
+                >
+                  <div className="h-40 overflow-hidden border-b border-black/10">
+                    <img
+                      src={rec.cover_image || "https://images.unsplash.com/photo-1498050108023-c5249f4df085"}
+                      alt={rec.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                    />
+                  </div>
+                  <div className="p-5 flex flex-col flex-grow">
+                    <h4 className="font-bold mb-2 group-hover:text-gray-600 transition line-clamp-2 text-black">
+                      {rec.title}
+                    </h4>
+                    <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-grow">
+                      {rec.content}
+                    </p>
+                    <div className="text-xs text-gray-400 mt-auto pt-4 border-t border-black/10">
+                      {recReadTime} min read
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      )}
+    </main>
+  );
+}
