@@ -12,7 +12,7 @@ export default async function Home() {
     <main className="min-h-screen bg-[#FAF9F6] text-black">
       {/* Navbar */}
       <nav className="flex items-center justify-between px-8 py-6 bg-[#FAF9F6] border-b border-black/10">
-        <h1 className="text-3xl font-black tracking-tight text-black">
+        <h1 className="text-3xl font-extrabold tracking-tight text-black">
           Just A Blog
         </h1>
 
@@ -31,7 +31,7 @@ export default async function Home() {
             Personal Tech Journal
           </p>
 
-          <h1 className="text-6xl md:text-7xl font-black leading-tight mb-8 text-black">
+          <h1 className="text-6xl md:text-7xl font-extrabold leading-tight mb-8 text-black">
             Building, Learning
             <br />
             & Sharing
@@ -71,7 +71,7 @@ export default async function Home() {
       >
         <div className="flex items-center justify-between mb-14">
           <div>
-            <h2 className="text-5xl font-black mb-3 text-black">
+            <h2 className="text-5xl font-extrabold mb-3 text-black">
               Latest Blogs
             </h2>
 
