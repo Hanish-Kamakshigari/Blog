@@ -52,10 +52,15 @@ export default function WritePage() {
     setLoading(false);
 
     if (error) {
-      alert("Failed to publish");
-      console.log(error);
-      return;
-    }
+  console.log(error);
+
+  alert(
+    error.message ||
+    JSON.stringify(error)
+  );
+
+  return;
+}
 
     alert("Blog published!");
 
