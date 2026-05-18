@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+
 import { supabase } from "@/lib/supabase";
 
 export default async function Home() {
@@ -13,16 +14,41 @@ export default async function Home() {
     <main className="min-h-screen bg-[#FAF9F6] text-black">
       {/* Navbar */}
       <nav className="flex items-center justify-between px-8 py-6 bg-[#FAF9F6] border-b border-black/10">
-        <h1 className="text-3xl font-extrabold tracking-tight text-black">
-          Just A Blog
-        </h1>
+        {/* Left Side */}
+        <div className="flex items-center gap-4">
+          <img
+            src="/icon.png"
+            alt="Logo"
+            className="w-11 h-11 rounded-full object-cover border border-black/10"
+          />
 
-        <a
-          href="mailto:hanishkamakshigari@gmail.com"
-          className="text-gray-500 hover:text-black transition"
-        >
-          Contact
-        </a>
+          <h1 className="text-3xl font-extrabold tracking-tight text-black">
+            Just A Blog
+          </h1>
+        </div>
+
+        {/* Right Side */}
+        <div className="flex items-center gap-5">
+          <a
+            href="mailto:hanishkamakshigari@gmail.com"
+            className="text-gray-500 hover:text-black transition"
+          >
+            Contact
+          </a>
+
+          <a
+            href="https://hanish-folio.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:scale-110 transition"
+          >
+            <img
+              src="/pp.jpeg"
+              alt="Portfolio"
+              className="w-10 h-10 rounded-full object-cover border border-black/10"
+            />
+          </a>
+        </div>
       </nav>
 
       {/* Hero Section */}
