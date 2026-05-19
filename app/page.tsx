@@ -16,11 +16,7 @@ export default async function Home() {
       <nav className="flex items-center justify-between px-8 py-6 bg-[#FAF9F6] border-b border-black/10">
         {/* Left Side */}
         <div className="flex items-center gap-4">
-          <img
-            src="/icon.png"
-            alt="Logo"
-            className="w-11 h-11 rounded-full object-cover border border-black/10"
-          />
+          
 
           <h1 className="text-3xl font-extrabold tracking-tight text-black">
             Just A Blog
