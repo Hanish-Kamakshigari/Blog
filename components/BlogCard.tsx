@@ -1,8 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
+import type { Post } from "@/types/blog";
 
-export default function BlogCard({ blog }: { blog: any }) {
+export default function BlogCard({ blog }: { blog: Post }) {
+  const readTime = Math.max(1, Math.ceil((blog.content || "").split(/\s+/).length / 200));
+  const date = new Date(blog.created_at).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
   return (
     <motion.a
       href={`/blog/${blog.slug}`}
@@ -20,7 +28,6 @@ export default function BlogCard({ blog }: { blog: any }) {
       viewport={{ once: true }}
       className="group bg-white/5 border border-white/10 rounded-3xl overflow-hidden hover:border-blue-500/40 hover:-translate-y-2 transition duration-300"
     >
-      {/* Image */}
       <div className="relative overflow-hidden">
         <img
           src={
@@ -34,14 +41,11 @@ export default function BlogCard({ blog }: { blog: any }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
       </div>
 
-      {/* Content */}
       <div className="p-7">
         <div className="flex items-center gap-3 text-sm text-gray-500 mb-5">
-          <span>14 May 2026</span>
-
+          <span>{date}</span>
           <span>•</span>
-
-          <span>1 min read</span>
+          <span>{readTime} min read</span>
         </div>
 
         <h2 className="text-3xl font-bold leading-tight mb-5 group-hover:text-blue-400 transition">

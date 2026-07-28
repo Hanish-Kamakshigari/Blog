@@ -1,4 +1,28 @@
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import type { Metadata } from "next";
+import type { Post } from "@/types/blog";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const { data: blog } = await supabase
+    .from("posts")
+    .select("title, content, cover_image")
+    .eq("slug", slug)
+    .single();
+
+  if (!blog) return { title: "Blog not found" };
+
+  return {
+    title: blog.title,
+    description: blog.content?.slice(0, 160),
+    openGraph: blog.cover_image ? { images: [blog.cover_image] } : undefined,
+  };
+}
 
 export default async function BlogPage({
   params,
@@ -7,21 +31,22 @@ export default async function BlogPage({
 }) {
   const { slug } = await params;
 
-  // Fetch blog from Supabase
   const { data: blog, error } = await supabase
     .from("posts")
     .select("*")
     .eq("slug", slug)
     .single();
 
-  // Fetch recommendations
   const { data: recommendations } = await supabase
     .from("posts")
     .select("*")
     .neq("slug", slug)
     .limit(4);
 
-  if (error || !blog) {
+  const post = blog as Post;
+  const related = (recommendations || []) as Post[];
+
+  if (error || !post) {
     return (
       <main className="p-10 min-h-screen bg-[#FAF9F6] text-black">
         <h1 className="text-2xl font-bold">
@@ -31,8 +56,8 @@ export default async function BlogPage({
     );
   }
 
-  const readTime = Math.max(1, Math.ceil((blog.content || "").split(/\s+/).length / 200));
-  const dateObj = new Date(blog.created_at || Date.now());
+  const readTime = Math.max(1, Math.ceil((post.content || "").split(/\s+/).length / 200));
+  const dateObj = new Date(post.created_at);
   const dateString = dateObj.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
@@ -41,49 +66,43 @@ export default async function BlogPage({
 
   return (
     <main className="min-h-screen pb-24 bg-[#FAF9F6] text-black">
-      {/* Navbar/Header equivalent */}
       <nav className="px-8 py-8 max-w-4xl mx-auto">
-        <a href="/" className="text-gray-500 hover:text-black flex items-center gap-2 transition w-fit font-medium">
-          ← Back to Home
-        </a>
+        <Link href="/" className="text-gray-500 hover:text-black flex items-center gap-2 transition w-fit font-medium">
+          &larr; Back to Home
+        </Link>
       </nav>
 
       <article className="max-w-4xl mx-auto px-8">
-        {/* Title */}
         <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-          {blog.title}
+          {post.title}
         </h1>
 
-        {/* Meta */}
         <div className="flex items-center text-sm text-gray-500 mb-8 pb-8 border-b border-black/10">
           <div className="flex items-center gap-2 mt-0.5 text-xs">
             <span>{dateString}</span>
-            <span>•</span>
+            <span>&bull;</span>
             <span>{readTime} min read</span>
           </div>
         </div>
 
-        {/* Cover Image */}
-        {blog.cover_image && (
+        {post.cover_image && (
           <img
-            src={blog.cover_image}
-            alt={blog.title}
+            src={post.cover_image}
+            alt={post.title}
             className="w-full h-[400px] object-cover rounded-2xl mb-10 shadow-sm"
           />
         )}
 
-        {/* Content */}
         <div className="text-lg leading-relaxed whitespace-pre-line text-gray-800">
-          {blog.content}
+          {post.content}
         </div>
       </article>
 
-      {/* Recommendations */}
-      {recommendations && recommendations.length > 0 && (
+      {related.length > 0 && (
         <section className="max-w-4xl mx-auto px-8 mt-24 pt-12 border-t border-black/10">
           <h3 className="text-2xl font-bold mb-8">More to read</h3>
           <div className="grid sm:grid-cols-2 gap-8">
-            {recommendations.map((rec) => {
+            {related.map((rec) => {
               const recReadTime = Math.max(1, Math.ceil((rec.content || "").split(/\s+/).length / 200));
               return (
                 <a
